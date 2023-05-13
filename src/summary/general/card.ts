@@ -1,0 +1,25 @@
+import { assign } from "../common";
+import type { PrioritizedReference } from "../common";
+
+export default function getCard(url: URL, html: HTMLRewriter) {
+  const result: PrioritizedReference<string | null> = {
+    bits: 1, // 0-1
+    priority: 0,
+    content: null,
+  };
+  html.on('meta[property="twitter:card"]', {
+    element(element) {
+      const content = element.getAttribute("content");
+      if (content) {
+        assign(result, 1, content);
+      }
+    },
+  });
+  return new Promise<string | null>((resolve) => {
+    html.onDocument({
+      end() {
+        resolve(result.content);
+      },
+    });
+  });
+}

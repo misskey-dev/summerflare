@@ -25,6 +25,7 @@ app.get("/url", async (context) => {
     return context.json({ error: "Invalid URL" }, 400);
   }
   const response = await fetch(url);
+  url = new URL(response.url);
   const rewriter = new HTMLRewriter();
   const summarized = summary(url, rewriter);
   const reader = rewriter.transform(response).body!.getReader();

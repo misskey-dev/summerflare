@@ -61,7 +61,7 @@ export default function general(url: URL, html: HTMLRewriter) {
       }
       return {
         title,
-        image,
+        thumbnail: image,
         description: title === description ? null : description,
         player,
         sitename: siteName,

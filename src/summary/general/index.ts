@@ -43,6 +43,7 @@ export default function general(url: URL, html: HTMLRewriter) {
   const sensitive = getSensitive(url, html);
 
   return Promise.all([
+    card,
     title,
     image,
     player,
@@ -51,7 +52,7 @@ export default function general(url: URL, html: HTMLRewriter) {
     favicon,
     sensitive,
   ]).then(
-    ([title, image, player, description, siteName, favicon, sensitive]) => {
+    ([card, title, image, player, description, siteName, favicon, sensitive]) => {
       if (title === null) {
         return null;
       }
@@ -66,6 +67,7 @@ export default function general(url: URL, html: HTMLRewriter) {
         sitename: siteName,
         icon: favicon,
         sensitive,
+        large: card === "summary_large_image",
         url: url.href,
       };
     }

@@ -9,6 +9,10 @@ pnpm i
 pnpm wrangler publish
 ```
 
+After executing the above command, access <https://workers.example/url?url=https%3A%2F%2Fexample.com> to verify that the worker is working properly.
+Then configure your Misskey server to use the URL of the worker by setting the Summaly Proxy URL to <https://workers.example/url> in <https://misskey.example/admin/security>.
+Alternatively, you can directly deploy the worker to your domain by setting the route in Cloudflare dashboard.
+
 ## License
 
 Licensed under either of

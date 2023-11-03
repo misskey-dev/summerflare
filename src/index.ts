@@ -20,7 +20,7 @@ const app = new Hono<Env>();
 
 app.onError((error, context) => {
   console.error(error);
-  return context.json({ error: error.message, stack: error.stack }, 500);
+  return context.json({ error: error.message }, 500);
 });
 
 app.get("/url", async (context) => {

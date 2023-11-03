@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import summary from "./summary";
+import { getNormalizer } from "./encoding";
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -17,6 +18,11 @@ export interface Env {
 
 const app = new Hono<Env>();
 
+app.onError((error, context) => {
+  console.error(error);
+  return context.json({ error: error.message, stack: error.stack }, 500);
+});
+
 app.get("/url", async (context) => {
   let url: URL;
   try {
@@ -26,9 +32,13 @@ app.get("/url", async (context) => {
   }
   const response = await fetch(url);
   url = new URL(response.url);
+  const [left, right] = response.body!.tee();
+  const normalizer = await getNormalizer(new Response(left, response));
   const rewriter = new HTMLRewriter();
   const summarized = summary(url, rewriter);
-  const reader = rewriter.transform(response).body!.getReader();
+  const reader = rewriter
+    .transform(new Response(right.pipeThrough(normalizer), response))
+    .body!.getReader();
   while (!(await reader.read()).done);
   return context.json(await summarized);
 });

@@ -66,6 +66,7 @@ export default function amazon(url: URL, html: HTMLRewriter) {
         sitename: siteName,
         icon: favicon,
         sensitive,
+        url: url.href,
       };
     }
   );

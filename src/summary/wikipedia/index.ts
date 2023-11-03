@@ -19,5 +19,6 @@ export default async function wikipedia(url: URL, html: HTMLRewriter) {
       height: null,
     },
     sitename: "Wikipedia",
+    url: url.href,
   };
 }

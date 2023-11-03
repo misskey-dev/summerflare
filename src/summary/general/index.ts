@@ -64,6 +64,7 @@ export default function general(url: URL, html: HTMLRewriter) {
         thumbnail: image,
         description: title === description ? null : description,
         player,
+        allow: [],
         sitename: siteName,
         icon: favicon,
         sensitive,

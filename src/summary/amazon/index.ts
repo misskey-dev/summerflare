@@ -63,6 +63,7 @@ export default function amazon(url: URL, html: HTMLRewriter) {
         image,
         description: title === description ? null : description,
         player,
+        allow: [],
         sitename: siteName,
         icon: favicon,
         sensitive,

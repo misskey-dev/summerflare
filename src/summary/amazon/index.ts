@@ -14,7 +14,7 @@ import getSensitive from "../general/sensitive";
 export default function amazon(url: URL, html: HTMLRewriter) {
   const card = getCard(url, html);
   const title = getTitle(url, html);
-  const image = getImage(url, html);
+  const thumbnail = getImage(url, html);
   const player = Promise.all([
     card,
     getPlayerUrlGeneral(url, html),
@@ -44,14 +44,14 @@ export default function amazon(url: URL, html: HTMLRewriter) {
 
   return Promise.all([
     title,
-    image,
+    thumbnail,
     player,
     description,
     siteName,
     favicon,
     sensitive,
   ]).then(
-    ([title, image, player, description, siteName, favicon, sensitive]) => {
+    ([title, thumbnail, player, description, siteName, favicon, sensitive]) => {
       if (title === null) {
         return null;
       }
@@ -60,7 +60,7 @@ export default function amazon(url: URL, html: HTMLRewriter) {
       }
       return {
         title,
-        image,
+        thumbnail,
         description: title === description ? null : description,
         player,
         allow: [],

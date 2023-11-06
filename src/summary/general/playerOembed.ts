@@ -1,6 +1,6 @@
 import { assign } from "../common";
 import { PlayerReference } from "./player";
-import he from "he";
+import { decode } from "html-entities";
 
 export default function getPlayerOembed(
   url: URL,
@@ -10,9 +10,7 @@ export default function getPlayerOembed(
 ) {
   html.on('link[type="application/json+oembed"]', {
     async element(element) {
-      const oembedInfoUrl = he.decode(
-        element.getAttribute("href") ?? "",
-      );
+      const oembedInfoUrl = decode(element.getAttribute("href") ?? "");
       if (!oembedInfoUrl) return;
 
       console.log("url", oembedInfoUrl);

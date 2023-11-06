@@ -2,14 +2,12 @@
   "packageManager": "pnpm@8.3.1",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230511.0",
-    "@types/he": "^1.2.2",
     "@types/whatwg-mimetype": "^3.0.1",
     "vitest": "^0.31.0",
     "wrangler": "^2.20.0"
   },
   "dependencies": {
     "@zxing/text-encoding": "^0.9.0",
-    "he": "^1.2.0",
     "hono": "^3.1.8",
     "html-entities": "^2.3.3",
     "summaly": "^2.7.0",

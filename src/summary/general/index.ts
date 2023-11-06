@@ -10,6 +10,7 @@ import getPlayerUrlWidth from "./playerUrlWidth";
 import getSiteName from "./siteName";
 import getTitle from "./title";
 import getSensitive from "./sensitive";
+import getPlayer, { Player } from "./player";
 
 export default function general(url: URL, html: HTMLRewriter) {
   const card = getCard(url, html);
@@ -17,25 +18,16 @@ export default function general(url: URL, html: HTMLRewriter) {
   const image = getImage(url, html);
   const player = Promise.all([
     card,
-    getPlayerUrlGeneral(url, html),
-    getPlayerUrlCommon(url, html),
-    getPlayerUrlWidth(url, html),
-    getPlayerUrlHeight(url, html),
-  ]).then(([card, general, common, width, height]) => {
-    const url = (card !== "summary_large_image" && general) || common;
-    if (url !== null && width !== null && height !== null) {
-      return {
-        url,
-        width,
-        height,
-      };
-    } else {
-      return {
-        url: null,
-        width: null,
-        height: null,
-      };
-    }
+    getPlayer(url, html),
+  ]).then<Player>(([card, parsedPlayer]) => {
+    return {
+      url: card !== "summary_large_image"
+        ? parsedPlayer.urlGeneral
+        : parsedPlayer.urlCommon,
+      height: parsedPlayer.height,
+      width: parsedPlayer.width,
+      allow: parsedPlayer.allow,
+    };
   });
   const description = getDescription(url, html);
   const siteName = getSiteName(url, html);
@@ -52,7 +44,9 @@ export default function general(url: URL, html: HTMLRewriter) {
     favicon,
     sensitive,
   ]).then(
-    ([card, title, image, player, description, siteName, favicon, sensitive]) => {
+    (
+      [card, title, image, player, description, siteName, favicon, sensitive],
+    ) => {
       if (title === null) {
         return null;
       }
@@ -71,6 +65,6 @@ export default function general(url: URL, html: HTMLRewriter) {
         large: card === "summary_large_image",
         url: url.href,
       };
-    }
+    },
   );
 }

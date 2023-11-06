@@ -1,17 +1,25 @@
-import { assign, toAbsoluteURL } from "../common";
+import {
+  assign,
+  prioritizedReference,
+  subAssign,
+  toAbsoluteURL,
+} from "../common";
 import type { PrioritizedReference } from "../common";
+import { PlayerReference } from "./player";
 
-export default function getPlayerUrlCommon(url: URL, html: HTMLRewriter) {
-  const result: PrioritizedReference<string | null> = {
-    bits: 2, // 0-3
-    priority: 0,
-    content: null,
-  };
+export default function getPlayerUrlCommon(
+  url: URL,
+  html: HTMLRewriter,
+  player: PlayerReference,
+  priority: number,
+) {
+  const result = prioritizedReference<string | null>(null);
+
   html.on('meta[property="og:video"]', {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 3, content);
+        subAssign(player.urlCommon, priority, result, 3, content);
       }
     },
   });
@@ -19,7 +27,7 @@ export default function getPlayerUrlCommon(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 2, content);
+        subAssign(player.urlCommon, priority, result, 2, content);
       }
     },
   });
@@ -27,17 +35,8 @@ export default function getPlayerUrlCommon(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 1, content);
+        subAssign(player.urlCommon, priority, result, 1, content);
       }
     },
-  });
-  return new Promise<string | null>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(
-          result.content ? toAbsoluteURL(result.content, url.href) : null
-        );
-      },
-    });
   });
 }

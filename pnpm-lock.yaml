@@ -1,9 +1,16 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@zxing/text-encoding':
     specifier: ^0.9.0
     version: 0.9.0
+  he:
+    specifier: ^1.2.0
+    version: 1.2.0
   hono:
     specifier: ^3.1.8
     version: 3.1.8
@@ -21,6 +28,9 @@ devDependencies:
   '@cloudflare/workers-types':
     specifier: ^4.20230511.0
     version: 4.20230511.0
+  '@types/he':
+    specifier: ^1.2.2
+    version: 1.2.2
   '@types/whatwg-mimetype':
     specifier: ^3.0.1
     version: 3.0.1
@@ -673,6 +683,10 @@ packages:
     resolution: {integrity: sha512-mEo1sAde+UCE6b2hxn332f1g1E8WfYRu6p5SvTKr2ZKC1f7gFJXk4h5PyGP9Dt6gCaG8y8XhwnXWC6Iy2cmBng==}
     dev: true
 
+  /@types/he@1.2.2:
+    resolution: {integrity: sha512-v2gT1gRK65k9nz8SVSXo3lh7AHnRPL3mRcYNhhsqL/L2S1xt/MGyEI5a7vJPXWik/IxTtAktXf8/HlCxDR1nsw==}
+    dev: true
+
   /@types/http-cache-semantics@4.0.1:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
@@ -1284,6 +1298,11 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       has-symbols: 1.0.3
+    dev: false
+
+  /he@1.2.0:
+    resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
+    hasBin: true
     dev: false
 
   /hono@3.1.8:

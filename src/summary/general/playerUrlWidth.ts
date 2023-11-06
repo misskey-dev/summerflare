@@ -1,17 +1,20 @@
-import { assign } from "../common";
+import { assign, prioritizedReference, subAssign } from "../common";
 import type { PrioritizedReference } from "../common";
+import { PlayerReference } from "./player";
 
-export default function getPlayerUrlWidth(url: URL, html: HTMLRewriter) {
-  const result: PrioritizedReference<string | null> = {
-    bits: 2, // 0-3
-    priority: 0,
-    content: null,
-  };
+export default function getPlayerUrlWidth(
+  url: URL,
+  html: HTMLRewriter,
+  player: PlayerReference,
+  priority: number,
+) {
+  const result = prioritizedReference<number | null>(null);
+
   html.on('meta[property="twitter:player:width"]', {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 3, content);
+        subAssign(player.width, priority, result, 3, parseInt(content));
       }
     },
   });
@@ -19,7 +22,7 @@ export default function getPlayerUrlWidth(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 2, content);
+        subAssign(player.width, priority, result, 2, parseInt(content));
       }
     },
   });
@@ -27,16 +30,8 @@ export default function getPlayerUrlWidth(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content");
       if (content) {
-        assign(result, 1, content);
+        subAssign(player.width, priority, result, 1, parseInt(content));
       }
     },
-  });
-  return new Promise<number | null>((resolve) => {
-    html.onDocument({
-      end() {
-        const content = parseInt(result.content!, 10);
-        resolve(Number.isNaN(content) ? null : content);
-      },
-    });
   });
 }

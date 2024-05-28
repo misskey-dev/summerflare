@@ -1,3 +1,4 @@
+import { decode } from "html-entities"
 import { assign } from "../common"
 import type { PrioritizedReference } from "../common"
 
@@ -11,7 +12,7 @@ export default function getSiteName(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 3, content)
+        assign(result, 3, decode(content))
       }
     },
   })
@@ -19,7 +20,7 @@ export default function getSiteName(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 2, content)
+        assign(result, 2, decode(content))
       }
     },
   })

@@ -59,12 +59,10 @@ export default function getPlayerOEmbed(url: URL, html: HTMLRewriter) {
       if (!oEmbedHref) {
         return
       }
-      console.log(oEmbedHref)
       const oEmbedData: unknown = await fetch(oEmbedHref, fetchOptions)
         .then((response) => response.json())
         .catch(() => undefined)
       const { success, data } = oEmbed.safeParse(oEmbedData)
-      console.log(oEmbedData, success, data)
       if (!success) {
         return
       }

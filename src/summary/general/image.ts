@@ -1,3 +1,4 @@
+import { decode } from "html-entities"
 import { assign, toAbsoluteURL } from "../common"
 import type { PrioritizedReference } from "../common"
 
@@ -11,7 +12,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 7, content)
+        assign(result, 7, decode(content))
       }
     },
   })
@@ -19,7 +20,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 6, content)
+        assign(result, 6, decode(content))
       }
     },
   })
@@ -27,7 +28,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
-        assign(result, 5, content)
+        assign(result, 5, decode(content))
       }
     },
   })
@@ -35,7 +36,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
-        assign(result, 4, content)
+        assign(result, 4, decode(content))
       }
     },
   })
@@ -43,7 +44,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
-        assign(result, 3, content)
+        assign(result, 3, decode(content))
       }
     },
   })

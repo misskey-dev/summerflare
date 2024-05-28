@@ -2,13 +2,13 @@
   "packageManager": "pnpm@8.3.1",
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "0.1.17",
-    "@cloudflare/workers-types": "^4.20240405.0",
+    "@cloudflare/workers-types": "^4.20240524.0",
     "@types/whatwg-mimetype": "^3.0.2",
     "vitest": "1.3.0",
-    "wrangler": "^3.48.0"
+    "wrangler": "^3.57.1"
   },
   "dependencies": {
-    "hono": "^4.2.3",
+    "hono": "^4.4.0",
     "html-entities": "^2.5.2",
     "jschardet": "^3.1.2",
     "summaly": "^2.7.0",

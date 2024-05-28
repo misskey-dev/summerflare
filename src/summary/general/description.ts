@@ -1,6 +1,7 @@
 import clip from "summaly/built/utils/clip"
 import { assign } from "../common"
 import type { PrioritizedReference } from "../common"
+import { decode } from "html-entities"
 
 export default function getDescription(url: URL, html: HTMLRewriter) {
   const result: PrioritizedReference<string | null> = {
@@ -12,7 +13,7 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 3, content)
+        assign(result, 3, decode(content))
       }
     },
   })
@@ -20,7 +21,7 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 2, content)
+        assign(result, 2, decode(content))
       }
     },
   })
@@ -28,7 +29,7 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
-        assign(result, 1, content)
+        assign(result, 1, decode(content))
       }
     },
   })

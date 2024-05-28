@@ -1,59 +1,57 @@
-import { assign, toAbsoluteURL } from "../common";
-import type { PrioritizedReference } from "../common";
+import { assign, toAbsoluteURL } from "../common"
+import type { PrioritizedReference } from "../common"
 
 export default function getImage(url: URL, html: HTMLRewriter) {
   const result: PrioritizedReference<string | null> = {
     bits: 3, // 0-7
     priority: 0,
     content: null,
-  };
+  }
   html.on('meta[property="og:image"]', {
     element(element) {
-      const content = element.getAttribute("content");
+      const content = element.getAttribute("content")
       if (content) {
-        assign(result, 7, content);
+        assign(result, 7, content)
       }
     },
-  });
+  })
   html.on('meta[name="twitter:image"]', {
     element(element) {
-      const content = element.getAttribute("content");
+      const content = element.getAttribute("content")
       if (content) {
-        assign(result, 6, content);
+        assign(result, 6, content)
       }
     },
-  });
+  })
   html.on('link[rel="image_src"]', {
     element(element) {
-      const content = element.getAttribute("href");
+      const content = element.getAttribute("href")
       if (content) {
-        assign(result, 5, content);
+        assign(result, 5, content)
       }
     },
-  });
+  })
   html.on('link[rel="apple-touch-icon"]', {
     element(element) {
-      const content = element.getAttribute("href");
+      const content = element.getAttribute("href")
       if (content) {
-        assign(result, 4, content);
+        assign(result, 4, content)
       }
     },
-  });
+  })
   html.on('link[rel="apple-touch-icon image_src"]', {
     element(element) {
-      const content = element.getAttribute("href");
+      const content = element.getAttribute("href")
       if (content) {
-        assign(result, 3, content);
+        assign(result, 3, content)
       }
     },
-  });
+  })
   return new Promise<string | null>((resolve) => {
     html.onDocument({
       end() {
-        resolve(
-          result.content ? toAbsoluteURL(result.content, url.href) : null
-        );
+        resolve(result.content ? toAbsoluteURL(result.content, url.href) : null)
       },
-    });
-  });
+    })
+  })
 }

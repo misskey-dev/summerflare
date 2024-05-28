@@ -1,69 +1,52 @@
-// due to the bug in the Cloudflare Workers runtime, we have to use @zxing/text-encoding instead of the built-in TextEncoder/TextDecoder.
-import { encodingIndexes } from "@zxing/text-encoding/esm/encoding-indexes";
-(globalThis as any).TextEncodingIndexes = { encodingIndexes };
+﻿import { UniversalDetector } from "jschardet/src"
+import MIMEType from "whatwg-mimetype"
 
-import { TextDecoder, TextEncoder } from "@zxing/text-encoding";
-import MIMEType from "whatwg-mimetype";
-
-function getCharsetFromHeader(response: Response): string | null {
-  const contentType = response.headers.get("Content-Type");
-  if (contentType === null) {
-    return null;
-  }
-  try {
-    const mimeType = new MIMEType(contentType);
-    return mimeType.parameters.get("charset") ?? null;
-  } catch {
-    return null;
-  }
+function getCharset(value: string | null): string | null {
+  const type = value === null ? null : MIMEType.parse(value)
+  return type?.parameters.get("charset") ?? null
 }
 
-async function getCharsetFromBody(response: Response): Promise<string | null> {
-  let charset: string | null = null;
-  const rewriter = new HTMLRewriter();
-  rewriter.on("meta", {
-    element(element) {
-      const httpEquiv = element.getAttribute("http-equiv");
-      if (
-        charset === null &&
-        httpEquiv !== null &&
-        httpEquiv.toLowerCase() === "content-type"
-      ) {
-        const content = element.getAttribute("content");
-        if (content !== null) {
-          try {
-            const mimeType = new MIMEType(content);
-            charset = mimeType.parameters.get("charset") ?? null;
-          } catch {}
+async function guessCharsetFromBody(body: ReadableStream<any>): Promise<string | null> {
+  const detector = new UniversalDetector()
+  const decoder = new TextDecoder()
+  for await (const chunk of body) {
+    detector.feed(decoder.decode(chunk, { stream: true }))
+    if (detector.done) {
+      break
+    }
+  }
+  detector.close()
+  return detector.result?.encoding ?? null
+}
+
+export async function normalize(response: Response): Promise<Response> {
+  const headers = new Headers(response.headers)
+  if (!getCharset(headers.get("content-type"))) {
+    const [left, right] = response.body!.tee()
+    response = new Response(left, response)
+    const rewriter = new HTMLRewriter()
+    rewriter.on("meta", {
+      element(element) {
+        const httpEquiv = element.getAttribute("http-equiv")?.toLowerCase()
+        if (httpEquiv === "content-type") {
+          headers.set(httpEquiv, element.getAttribute("content")!)
         }
-      }
-      const charsetAttr = element.getAttribute("charset");
-      if (charsetAttr !== null) {
-        charset = charsetAttr;
-      }
-    },
-  });
-  const reader = rewriter.transform(response).body!.getReader();
-  while (!(await reader.read()).done);
-  return charset;
-}
-
-export async function getNormalizer(
-  response: Response
-): Promise<TransformStream<Uint8Array, Uint8Array>> {
-  const charset =
-    getCharsetFromHeader(response) ?? (await getCharsetFromBody(response));
-  if (charset === null || charset.toLowerCase() === "utf-8") {
-    return new TransformStream();
+      },
+    })
+    const reader = rewriter.transform(new Response(right, response)).body!.getReader()
+    while (!(await reader.read()).done);
   }
-  const decoder = new TextDecoder(charset, { fatal: true, ignoreBOM: true });
-  const encoder = new TextEncoder();
-  const transform = new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      controller.enqueue(
-        encoder.encode(decoder.decode(chunk, { stream: true }))
-      );
-    },
-  });
-  return transform;
+  if (!headers.has("content-type")) {
+    const [left, right] = response.body!.tee()
+    response = new Response(left, response)
+    const guessed = await guessCharsetFromBody(right)
+    if (guessed) {
+      headers.set("content-type", `text/html; charset=${guessed}`)
+    }
+  }
+  return new Response(response.body, {
+    headers,
+    status: response.status,
+    statusText: response.statusText,
+  })
 }

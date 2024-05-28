@@ -1,3 +1,4 @@
 name = "summerflare"
 main = "src/index.ts"
-compatibility_date = "2023-05-13"
+compatibility_date = "2024-05-13"
+compatibility_flags = ["nodejs_compat"]

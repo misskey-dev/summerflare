@@ -6,7 +6,7 @@
 
 ```bash
 pnpm i
-pnpm wrangler publish
+pnpm wrangler deploy --minify
 ```
 
 After executing the above command, access <https://workers.example/url?url=https%3A%2F%2Fexample.com> to verify that the worker is working properly.

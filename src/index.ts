@@ -50,6 +50,7 @@ if (import.meta.vitest) {
       [
         "the simple UTF-8 encoded website",
         "https://example.com/",
+        "text/html; charset=UTF-8",
         {
           title: "Example Domain",
           thumbnail: null,
@@ -70,6 +71,7 @@ if (import.meta.vitest) {
       [
         "the simple Shift_JIS encoded website",
         "http://abehiroshi.la.coocan.jp/",
+        "text/html",
         {
           title: "阿部寛のホームページ",
           thumbnail: null,
@@ -90,6 +92,7 @@ if (import.meta.vitest) {
       [
         "the simple EUC-JP encoded website",
         "https://www.postgresql.jp/document/pg632doc/tutorial/f01.htm",
+        "text/html; charset=EUC-JP",
         {
           title: "概要",
           thumbnail: null,
@@ -110,6 +113,7 @@ if (import.meta.vitest) {
       [
         "the Shift_JIS encoded website with thumbnail",
         "https://store.shochiku.co.jp/shop/g/g23080501/",
+        "text/html; charset=shift_jis",
         {
           title: "アイドルマスター ミリオンライブ！ 第1幕　パンフレット",
           thumbnail: "https://store.shochiku.co.jp/img/goods/S/23080501s.jpg",
@@ -128,8 +132,30 @@ if (import.meta.vitest) {
         },
       ],
       [
+        "the EUC-JP encoded website with thumbnail",
+        "https://news.livedoor.com/article/detail/24612811/",
+        "text/html; charset=euc-jp",
+        {
+          description: "コミッションサービス「Skeb」を提供するSkebは7月14日、Twitterに投稿する形で、分散型SNS「Misskey」のスポンサーになったと発表した。Skebが分散型SNS「Misskey」のスポンサーに！Misskeyとは、分散型プロトコル",
+          icon: "https://parts.news.livedoor.com/img/favicon.ico?20230601",
+          large: true,
+          player: {
+            allow: [],
+            height: null,
+            url: null,
+            width: null,
+          },
+          sensitive: false,
+          sitename: "ライブドアニュース",
+          thumbnail: "https://image.news.livedoor.com/newsimage/stf/5/4/54209_1223_0ecb92105835b40f6ff567ce15c8e39e.jpg",
+          title: "Skebが分散型SNS「Misskey」のスポンサーに！",
+          url: "https://news.livedoor.com/article/detail/24612811/",
+        },
+      ],
+      [
         "the UTF-8 encoded website with oEmbed",
         "https://open.spotify.com/intl-ja/track/5Odr16TvEN4my22K9nbH7l",
+        "text/html; charset=utf-8",
         {
           description: "May'n · Song · 2012",
           icon: "https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico",
@@ -147,9 +173,12 @@ if (import.meta.vitest) {
           url: "https://open.spotify.com/track/5Odr16TvEN4my22K9nbH7l",
         },
       ],
-    ])("should return summary of %s <%s>", async (_, url, expected) => {
+    ])("should return summary of %s <%s>", async (_, url, contentType, expected) => {
       const request = new Request(`https://fakehost/url?${new URLSearchParams({ url })}`)
       const ctx = createExecutionContext()
+      const preconnect = await fetch(url, fetchOptions)
+      expect(preconnect.status).toBe(200)
+      expect(preconnect.headers.get("content-type")).toBe(contentType)
       const response = await app.fetch(request, env, ctx)
       await waitOnExecutionContext(ctx)
       expect(response.status).toBe(200)

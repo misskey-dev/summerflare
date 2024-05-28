@@ -14,7 +14,7 @@ export default function general(url: URL, html: HTMLRewriter) {
   const image = getImage(url, html)
   const player = Promise.all([card, getPlayer(url, html)]).then<Player>(([card, parsedPlayer]) => {
     return {
-      url: card !== "summary_large_image" && parsedPlayer.urlGeneral || parsedPlayer.urlCommon,
+      url: (card !== "summary_large_image" && parsedPlayer.urlGeneral) || parsedPlayer.urlCommon,
       width: parsedPlayer.width,
       height: parsedPlayer.height,
       allow: parsedPlayer.allow,

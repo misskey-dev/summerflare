@@ -103,7 +103,7 @@ export default function getPlayerOEmbed(url: URL, html: HTMLRewriter) {
                 headers: {
                   "Content-Type": "text/html; charset=UTF-8",
                 },
-              })
+              }),
             )
             .body?.getReader()
           while (reader != null && !(await reader.read()).done);

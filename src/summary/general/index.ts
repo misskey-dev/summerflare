@@ -3,32 +3,21 @@ import getCard from "./card"
 import getDescription from "./description"
 import getFavicon from "./favicon"
 import getImage from "./image"
-import getPlayerUrlCommon from "./playerUrlCommon"
-import getPlayerUrlGeneral from "./playerUrlGeneral"
-import getPlayerUrlHeight from "./playerUrlHeight"
-import getPlayerUrlWidth from "./playerUrlWidth"
 import getSiteName from "./siteName"
 import getTitle from "./title"
 import getSensitive from "./sensitive"
+import getPlayer, { Player } from "./player"
 
 export default function general(url: URL, html: HTMLRewriter) {
   const card = getCard(url, html)
   const title = getTitle(url, html)
   const image = getImage(url, html)
-  const player = Promise.all([card, getPlayerUrlGeneral(url, html), getPlayerUrlCommon(url, html), getPlayerUrlWidth(url, html), getPlayerUrlHeight(url, html)]).then(([card, general, common, width, height]) => {
-    const url = (card !== "summary_large_image" && general) || common
-    if (url !== null && width !== null && height !== null) {
-      return {
-        url,
-        width,
-        height,
-      }
-    } else {
-      return {
-        url: null,
-        width: null,
-        height: null,
-      }
+  const player = Promise.all([card, getPlayer(url, html)]).then<Player>(([card, parsedPlayer]) => {
+    return {
+      url: card !== "summary_large_image" && parsedPlayer.urlGeneral || parsedPlayer.urlCommon,
+      width: parsedPlayer.width,
+      height: parsedPlayer.height,
+      allow: parsedPlayer.allow,
     }
   })
   const description = getDescription(url, html)
@@ -48,7 +37,6 @@ export default function general(url: URL, html: HTMLRewriter) {
       thumbnail: image,
       description: title === description ? null : description,
       player,
-      allow: [],
       sitename: siteName,
       icon: favicon,
       sensitive,

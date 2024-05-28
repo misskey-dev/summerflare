@@ -12,6 +12,7 @@
     "html-entities": "^2.5.2",
     "jschardet": "^3.1.2",
     "summaly": "^2.7.0",
-    "whatwg-mimetype": "^4.0.0"
+    "whatwg-mimetype": "^4.0.0",
+    "zod": "^3.23.8"
   }
 }

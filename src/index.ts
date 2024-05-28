@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { cf } from "./config"
+import { fetchOptions } from "./config"
 import { normalize } from "./encoding"
 import summary from "./summary"
 export interface Env {
@@ -30,13 +30,7 @@ app.get("/url", async (context) => {
   } catch (e) {
     return context.json({ error: "Invalid URL" }, 400)
   }
-  const response = (await fetch(url, {
-    cf,
-    headers: {
-      Accept: "text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8",
-      "User-Agent": "Mozilla/5.0 (compatible; Summerflare; +https://github.com/misskey-dev/summerflare)",
-    },
-  })) as any as Response
+  const response = (await fetch(url, fetchOptions)) as any as Response
   url = new URL(response.url)
   const rewriter = new HTMLRewriter()
   const summarized = summary(url, rewriter)
@@ -61,11 +55,11 @@ if (import.meta.vitest) {
           thumbnail: null,
           description: null,
           player: {
+            allow: [],
             url: null,
             width: null,
             height: null,
           },
-          allow: [],
           sitename: "example.com",
           icon: "https://example.com/favicon.ico",
           sensitive: false,
@@ -81,11 +75,11 @@ if (import.meta.vitest) {
           thumbnail: null,
           description: null,
           player: {
+            allow: [],
             url: null,
             width: null,
             height: null,
           },
-          allow: [],
           sitename: "abehiroshi.la.coocan.jp",
           icon: "http://abehiroshi.la.coocan.jp/favicon.ico",
           sensitive: false,
@@ -101,11 +95,11 @@ if (import.meta.vitest) {
           thumbnail: null,
           description: null,
           player: {
+            allow: [],
             url: null,
             width: null,
             height: null,
           },
-          allow: [],
           sitename: "www.postgresql.jp",
           icon: "https://www.postgresql.jp/favicon.ico",
           sensitive: false,
@@ -120,13 +114,37 @@ if (import.meta.vitest) {
           title: "アイドルマスター ミリオンライブ！ 第1幕　パンフレット",
           thumbnail: "https://store.shochiku.co.jp/img/goods/S/23080501s.jpg",
           description: "映画グッズ・アニメグッズを取り扱う通販サイト『Froovie/フルービー』です。ハリー･ポッター、ファンタスティック・ビースト、ガンダム、アニメなどのキャラクターグッズを多数揃えております。",
-          player: { url: null, width: null, height: null },
-          allow: [],
+          player: {
+            allow: [],
+            url: null,
+            width: null,
+            height: null,
+          },
           sitename: "SHOCHIKU STORE | 松竹ストア",
           icon: "https://store.shochiku.co.jp/favicon.ico",
           sensitive: false,
           large: false,
           url: "https://store.shochiku.co.jp/shop/g/g23080501/",
+        },
+      ],
+      [
+        "the UTF-8 encoded website with oEmbed",
+        "https://open.spotify.com/intl-ja/track/5Odr16TvEN4my22K9nbH7l",
+        {
+          description: "May'n · Song · 2012",
+          icon: "https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico",
+          large: false,
+          player: {
+            allow: ["autoplay", "clipboard-write", "encrypted-media", "fullscreen", "picture-in-picture"],
+            height: 152,
+            url: "https://open.spotify.com/embed/track/5Odr16TvEN4my22K9nbH7l?utm_source=oembed",
+            width: 456,
+          },
+          sensitive: false,
+          sitename: "Spotify",
+          thumbnail: "https://i.scdn.co/image/ab67616d0000b273357d721f236b923d864f1c2e",
+          title: "Brain Diver",
+          url: "https://open.spotify.com/track/5Odr16TvEN4my22K9nbH7l",
         },
       ],
     ])("should return summary of %s <%s>", async (_, url, expected) => {
@@ -136,7 +154,6 @@ if (import.meta.vitest) {
       await waitOnExecutionContext(ctx)
       expect(response.status).toBe(200)
       const body = await response.json()
-      console.log(body)
       expect(body).toStrictEqual(expected)
     })
   })

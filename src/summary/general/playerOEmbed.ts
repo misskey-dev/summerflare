@@ -1,6 +1,6 @@
 import { decode } from "html-entities"
 import { z } from "zod"
-import { fetchOptions } from "../../config"
+import { requestInit } from "../../config"
 import { assign, PrioritizedReference } from "../common"
 import type { ParsedPlayer } from "./player"
 
@@ -41,7 +41,8 @@ const oEmbed = z.union([
   }),
 ])
 
-export default function getPlayerOEmbed(url: URL, html: HTMLRewriter) {
+export default function getPlayerOEmbed(request: Request, url: URL, html: HTMLRewriter) {
+  const { promise, resolve, reject } = Promise.withResolvers<ParsedPlayer>()
   const result: PrioritizedReference<ParsedPlayer> = {
     bits: 1, // 0-1
     priority: 0,
@@ -59,7 +60,14 @@ export default function getPlayerOEmbed(url: URL, html: HTMLRewriter) {
       if (!oEmbedHref) {
         return
       }
-      const oEmbedData: unknown = await fetch(oEmbedHref, fetchOptions)
+      let init: RequestInit
+      try {
+        init = requestInit(request)
+      } catch (e) {
+        reject(e)
+        return
+      }
+      const oEmbedData: unknown = await fetch(oEmbedHref, init)
         .then((response) => response.json())
         .catch(() => undefined)
       const { success, data } = oEmbed.safeParse(oEmbedData)
@@ -112,11 +120,10 @@ export default function getPlayerOEmbed(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  return new Promise<ParsedPlayer>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(result.content)
-      },
-    })
+  html.onDocument({
+    end() {
+      resolve(result.content)
+    },
   })
+  return promise
 }

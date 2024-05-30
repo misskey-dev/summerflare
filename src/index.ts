@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { fetchOptions } from "./config"
+import { requestInit } from "./config"
 import { normalize } from "./encoding"
 import summary from "./summary"
 export interface Env {
@@ -30,10 +30,10 @@ app.get("/url", async (context) => {
   } catch (e) {
     return context.json({ error: "Invalid URL" }, 400)
   }
-  const response = (await fetch(url, fetchOptions)) as any as Response
+  const response = (await fetch(url, requestInit(context.req.raw))) as any as Response
   url = new URL(response.url)
   const rewriter = new HTMLRewriter()
-  const summarized = summary(url, rewriter)
+  const summarized = summary(context.req.raw, url, rewriter)
   const reader = (rewriter.transform(await normalize(response)).body as ReadableStream<Uint8Array>).getReader()
   while (!(await reader.read()).done);
   return context.json(await summarized)
@@ -176,7 +176,7 @@ if (import.meta.vitest) {
     ])("should return summary of %s <%s>", async (_, url, contentType, expected) => {
       const request = new Request(`https://fakehost/url?${new URLSearchParams({ url })}`)
       const ctx = createExecutionContext()
-      const preconnect = await fetch(url, fetchOptions)
+      const preconnect = await fetch(url, requestInit(request))
       expect(preconnect.status).toBe(200)
       expect(preconnect.headers.get("content-type")).toBe(contentType)
       const response = await app.fetch(request, env, ctx)

@@ -8,11 +8,11 @@ import getTitle from "./title"
 import getSensitive from "./sensitive"
 import getPlayer, { Player } from "./player"
 
-export default function general(url: URL, html: HTMLRewriter) {
+export default function general(request: Request, url: URL, html: HTMLRewriter) {
   const card = getCard(url, html)
   const title = getTitle(url, html)
   const image = getImage(url, html)
-  const player = Promise.all([card, getPlayer(url, html)]).then<Player>(([card, parsedPlayer]) => {
+  const player = Promise.all([card, getPlayer(request, url, html)]).then<Player>(([card, parsedPlayer]) => {
     return {
       url: (card !== "summary_large_image" && parsedPlayer.urlGeneral) || parsedPlayer.urlCommon,
       width: parsedPlayer.width,

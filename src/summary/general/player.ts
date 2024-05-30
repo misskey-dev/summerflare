@@ -16,8 +16,8 @@ export interface ParsedPlayer extends Omit<Player, "url"> {
   urlGeneral: string | null
 }
 
-export default function getPlayer(url: URL, html: HTMLRewriter): Promise<ParsedPlayer> {
-  const oEmbed = getPlayerOEmbed(url, html)
+export default function getPlayer(request: Request, url: URL, html: HTMLRewriter): Promise<ParsedPlayer> {
+  const oEmbed = getPlayerOEmbed(request, url, html)
   const urlGeneral = getPlayerUrlGeneral(url, html)
   const urlCommon = getPlayerUrlCommon(url, html)
   const width = getPlayerUrlWidth(url, html)

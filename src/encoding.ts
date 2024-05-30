@@ -1,5 +1,7 @@
-﻿import { UniversalDetector } from "jschardet/src"
+﻿import { decode } from "html-entities"
+import { UniversalDetector } from "jschardet/src"
 import MIMEType from "whatwg-mimetype"
+import { assign, PrioritizedReference } from "./summary/common"
 
 function getCharset(value: string | null): string | null {
   const type = value === null ? null : MIMEType.parse(value)
@@ -24,17 +26,31 @@ export async function normalize(response: Response): Promise<Response> {
   if (!getCharset(headers.get("content-type"))) {
     const [left, right] = response.body!.tee()
     response = new Response(left, response)
+    const result: PrioritizedReference<string | null> = {
+      bits: 2, // 0-3
+      priority: 0,
+      content: null,
+    }
     const rewriter = new HTMLRewriter()
     rewriter.on("meta", {
       element(element) {
+        const charset = element.getAttribute("charset")
+        if (charset) {
+          const mimeType = new MIMEType("text/html")
+          mimeType.parameters.set("charset", decode(charset))
+          assign(result, 3, mimeType.toString())
+        }
         const httpEquiv = element.getAttribute("http-equiv")?.toLowerCase()
         if (httpEquiv === "content-type") {
-          headers.set(httpEquiv, element.getAttribute("content")!)
+          assign(result, 2, element.getAttribute("content")!)
         }
       },
     })
     const reader = rewriter.transform(new Response(right, response)).body!.getReader()
     while (!(await reader.read()).done);
+    if (result.content) {
+      headers.set("content-type", result.content)
+    }
   }
   if (!headers.has("content-type")) {
     const [left, right] = response.body!.tee()

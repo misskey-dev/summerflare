@@ -2,6 +2,7 @@ import { Hono } from "hono"
 import { requestInit } from "./config"
 import { normalize } from "./encoding"
 import summary from "./summary"
+import type Context from "./context"
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace;
@@ -33,7 +34,11 @@ app.get("/url", async (context) => {
   const response = (await fetch(url, requestInit(context.req.raw))) as any as Response
   url = new URL(response.url)
   const rewriter = new HTMLRewriter()
-  const summarized = summary(context.req.raw, url, rewriter)
+  const summarized = summary({
+    html: rewriter,
+    request: context.req.raw,
+    url,
+  })
   const reader = (rewriter.transform(await normalize(response)).body as ReadableStream<Uint8Array>).getReader()
   while (!(await reader.read()).done);
   return context.json(await summarized)

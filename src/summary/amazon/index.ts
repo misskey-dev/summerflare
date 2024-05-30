@@ -10,12 +10,13 @@ import getPlayerUrlWidth from "../general/playerUrlWidth"
 import getSiteName from "../general/siteName"
 import getTitle from "./title"
 import getSensitive from "../general/sensitive"
+import type Context from "../../context"
 
-export default function amazon(url: URL, html: HTMLRewriter) {
-  const card = getCard(url, html)
-  const title = getTitle(url, html)
-  const thumbnail = getImage(url, html)
-  const player = Promise.all([card, getPlayerUrlGeneral(url, html), getPlayerUrlCommon(url, html), getPlayerUrlWidth(url, html), getPlayerUrlHeight(url, html)]).then(([card, general, common, width, height]) => {
+export default function amazon(context: Context) {
+  const card = getCard(context)
+  const title = getTitle(context)
+  const thumbnail = getImage(context)
+  const player = Promise.all([card, getPlayerUrlGeneral(context), getPlayerUrlCommon(context), getPlayerUrlWidth(context), getPlayerUrlHeight(context)]).then(([card, general, common, width, height]) => {
     const url = (card !== "summary_large_image" && general) || common
     if (url !== null && width !== null && height !== null) {
       return {
@@ -31,10 +32,10 @@ export default function amazon(url: URL, html: HTMLRewriter) {
       }
     }
   })
-  const description = getDescription(url, html)
-  const siteName = getSiteName(url, html)
-  const favicon = getFavicon(url, html)
-  const sensitive = getSensitive(url, html)
+  const description = getDescription(context)
+  const siteName = getSiteName(context)
+  const favicon = getFavicon(context)
+  const sensitive = getSensitive(context)
 
   return Promise.all([title, thumbnail, player, description, siteName, favicon, sensitive]).then(([title, thumbnail, player, description, siteName, favicon, sensitive]) => {
     if (title === null) {
@@ -51,7 +52,7 @@ export default function amazon(url: URL, html: HTMLRewriter) {
       sitename: siteName,
       icon: favicon,
       sensitive,
-      url: url.href,
+      url: context.url.href,
     }
   })
 }

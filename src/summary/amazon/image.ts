@@ -1,14 +1,16 @@
 import { decode } from "html-entities"
 import { assign, toAbsoluteURL } from "../common"
 import type { PrioritizedReference } from "../common"
+import type Context from "../../context"
 
-export default function getImage(url: URL, html: HTMLRewriter) {
+export default function getImage(context: Context) {
+  const { promise, resolve, reject } = Promise.withResolvers<string | null>()
   const result: PrioritizedReference<string | null> = {
     bits: 4, // 0-15
     priority: 0,
     content: null,
   }
-  html.on("#landingImage", {
+  context.html.on("#landingImage", {
     element(element) {
       const content = element.getAttribute("src")
       if (content) {
@@ -16,7 +18,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('meta[property="og:image"]', {
+  context.html.on('meta[property="og:image"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -24,7 +26,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('meta[name="twitter:image"]', {
+  context.html.on('meta[name="twitter:image"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -32,7 +34,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('link[rel="image_src"]', {
+  context.html.on('link[rel="image_src"]', {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
@@ -40,7 +42,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('link[rel="apple-touch-icon"]', {
+  context.html.on('link[rel="apple-touch-icon"]', {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
@@ -48,7 +50,7 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('link[rel="apple-touch-icon image_src"]', {
+  context.html.on('link[rel="apple-touch-icon image_src"]', {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
@@ -56,11 +58,10 @@ export default function getImage(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  return new Promise<string | null>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(result.content ? toAbsoluteURL(result.content, url.href) : null)
-      },
-    })
+  context.html.onDocument({
+    end() {
+      resolve(result.content ? toAbsoluteURL(result.content, context.url.href) : null)
+    },
   })
+  return promise
 }

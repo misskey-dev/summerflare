@@ -1,22 +1,23 @@
 import { assign } from "../common"
+import type Context from "../../context"
 import type { PrioritizedReference } from "../common"
 
-export default function getSensitive(url: URL, html: HTMLRewriter) {
+export default function getSensitive(context: Context) {
+  const { promise, resolve, reject } = Promise.withResolvers<boolean>()
   const result: PrioritizedReference<boolean> = {
     bits: 1, // 0-1
     priority: 0,
     content: false,
   }
-  html.on('.tweet[data-possibly-sensitive="true"]', {
+  context.html.on('.tweet[data-possibly-sensitive="true"]', {
     element() {
       assign(result, 1, true)
     },
   })
-  return new Promise<boolean>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(result.content)
-      },
-    })
+  context.html.onDocument({
+    end() {
+      resolve(result.content)
+    },
   })
+  return promise
 }

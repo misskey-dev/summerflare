@@ -2,20 +2,22 @@ import { decode } from "html-entities"
 import clip from "summaly/built/utils/clip"
 import { BufferedTextHandler, assign } from "../common"
 import type { PrioritizedReference } from "../common"
+import type Context from "../../context"
 
-export default function getDescription(url: URL, html: HTMLRewriter) {
+export default function getDescription(context: Context) {
+  const { promise, resolve, reject } = Promise.withResolvers<string | null>()
   const result: PrioritizedReference<string | null> = {
     bits: 3, // 0-7
     priority: 0,
     content: null,
   }
-  html.on(
+  context.html.on(
     "#productDescription",
     new BufferedTextHandler((text) => {
       assign(result, 7, decode(text))
     }),
   )
-  html.on('meta[property="og:description"]', {
+  context.html.on('meta[property="og:description"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -23,7 +25,7 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('meta[name="twitter:description"]', {
+  context.html.on('meta[name="twitter:description"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -31,7 +33,7 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('meta[name="description"]', {
+  context.html.on('meta[name="description"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -39,11 +41,10 @@ export default function getDescription(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  return new Promise<string | null>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(result.content && clip(result.content, 300))
-      },
-    })
+  context.html.onDocument({
+    end() {
+      resolve(result.content && clip(result.content, 300))
+    },
   })
+  return promise
 }

@@ -1,14 +1,16 @@
 import { decode } from "html-entities"
 import { assign, toAbsoluteURL } from "../common"
+import type Context from "../../context"
 import type { PrioritizedReference } from "../common"
 
-export default function getFavicon(url: URL, html: HTMLRewriter) {
+export default function getFavicon(context: Context) {
+  const { promise, resolve, reject } = Promise.withResolvers<string>()
   const result: PrioritizedReference<string> = {
     bits: 2, // 0-3
     priority: 0,
     content: "/favicon.ico",
   }
-  html.on('link[rel="shortcut icon"]', {
+  context.html.on('link[rel="shortcut icon"]', {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
@@ -16,7 +18,7 @@ export default function getFavicon(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('link[rel="icon"]', {
+  context.html.on('link[rel="icon"]', {
     element(element) {
       const content = element.getAttribute("href")
       if (content) {
@@ -24,11 +26,10 @@ export default function getFavicon(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  return new Promise<string>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(toAbsoluteURL(result.content, url.href))
-      },
-    })
+  context.html.onDocument({
+    end() {
+      resolve(toAbsoluteURL(result.content, context.url.href))
+    },
   })
+  return promise
 }

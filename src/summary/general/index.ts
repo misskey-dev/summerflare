@@ -7,12 +7,13 @@ import getSiteName from "./siteName"
 import getTitle from "./title"
 import getSensitive from "./sensitive"
 import getPlayer, { Player } from "./player"
+import type Context from "../../context"
 
-export default function general(request: Request, url: URL, html: HTMLRewriter) {
-  const card = getCard(url, html)
-  const title = getTitle(url, html)
-  const image = getImage(url, html)
-  const player = Promise.all([card, getPlayer(request, url, html)]).then<Player>(([card, parsedPlayer]) => {
+export default function general(context: Context) {
+  const card = getCard(context)
+  const title = getTitle(context)
+  const image = getImage(context)
+  const player = Promise.all([card, getPlayer(context)]).then<Player>(([card, parsedPlayer]) => {
     return {
       url: (card !== "summary_large_image" && parsedPlayer.urlGeneral) || parsedPlayer.urlCommon,
       width: parsedPlayer.width,
@@ -20,10 +21,10 @@ export default function general(request: Request, url: URL, html: HTMLRewriter) 
       allow: parsedPlayer.allow,
     }
   })
-  const description = getDescription(url, html)
-  const siteName = getSiteName(url, html)
-  const favicon = getFavicon(url, html)
-  const sensitive = getSensitive(url, html)
+  const description = getDescription(context)
+  const siteName = getSiteName(context)
+  const favicon = getFavicon(context)
+  const sensitive = getSensitive(context)
 
   return Promise.all([card, title, image, player, description, siteName, favicon, sensitive]).then(([card, title, image, player, description, siteName, favicon, sensitive]) => {
     if (title === null) {
@@ -41,7 +42,7 @@ export default function general(request: Request, url: URL, html: HTMLRewriter) 
       icon: favicon,
       sensitive,
       large: card === "summary_large_image",
-      url: url.href,
+      url: context.url.href,
     }
   })
 }

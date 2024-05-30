@@ -1,15 +1,17 @@
 import { decode } from "html-entities"
 import clip from "summaly/built/utils/clip"
 import { BufferedTextHandler, assign } from "../common"
+import type Context from "../../context"
 import type { PrioritizedReference } from "../common"
 
-export default function getTitle(url: URL, html: HTMLRewriter) {
+export default function getTitle(context: Context) {
+  const { promise, resolve, reject } = Promise.withResolvers<string | null>()
   const result: PrioritizedReference<string | null> = {
     bits: 2, // 0-3
     priority: 0,
     content: null,
   }
-  html.on('meta[property="og:title"]', {
+  context.html.on('meta[property="og:title"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -17,7 +19,7 @@ export default function getTitle(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on('meta[name="twitter:title"]', {
+  context.html.on('meta[name="twitter:title"]', {
     element(element) {
       const content = element.getAttribute("content")
       if (content) {
@@ -25,17 +27,16 @@ export default function getTitle(url: URL, html: HTMLRewriter) {
       }
     },
   })
-  html.on(
+  context.html.on(
     "title",
     new BufferedTextHandler((text) => {
       assign(result, 1, decode(text))
     }),
   )
-  return new Promise<string | null>((resolve) => {
-    html.onDocument({
-      end() {
-        resolve(result.content && clip(result.content, 100))
-      },
-    })
+  context.html.onDocument({
+    end() {
+      resolve(result.content && clip(result.content, 100))
+    },
   })
+  return promise
 }

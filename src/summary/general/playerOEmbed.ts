@@ -2,6 +2,7 @@ import { decode } from "html-entities"
 import { z } from "zod"
 import { requestInit } from "../../config"
 import { assign, PrioritizedReference } from "../common"
+import type Context from "../../context"
 import type { ParsedPlayer } from "./player"
 
 const oEmbedBase = z.object({
@@ -41,7 +42,7 @@ const oEmbed = z.union([
   }),
 ])
 
-export default function getPlayerOEmbed(request: Request, url: URL, html: HTMLRewriter) {
+export default function getPlayerOEmbed(context: Context) {
   const { promise, resolve, reject } = Promise.withResolvers<ParsedPlayer>()
   const result: PrioritizedReference<ParsedPlayer> = {
     bits: 1, // 0-1
@@ -54,7 +55,7 @@ export default function getPlayerOEmbed(request: Request, url: URL, html: HTMLRe
       allow: [],
     },
   }
-  html.on('link[type="application/json+oembed"]', {
+  context.html.on('link[type="application/json+oembed"]', {
     async element(element) {
       const oEmbedHref = decode(element.getAttribute("href") ?? "")
       if (!oEmbedHref) {
@@ -62,7 +63,7 @@ export default function getPlayerOEmbed(request: Request, url: URL, html: HTMLRe
       }
       let init: RequestInit
       try {
-        init = requestInit(request)
+        init = requestInit(context.request)
       } catch (e) {
         reject(e)
         return
@@ -120,7 +121,7 @@ export default function getPlayerOEmbed(request: Request, url: URL, html: HTMLRe
       }
     },
   })
-  html.onDocument({
+  context.html.onDocument({
     end() {
       resolve(result.content)
     },

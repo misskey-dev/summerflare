@@ -1,13 +1,14 @@
 import amazon from "./amazon"
 import general from "./general"
 import wikipedia from "./wikipedia"
+import type Context from "../context"
 
-export default function summary(request: Request, url: URL, html: HTMLRewriter) {
-  if (url.hostname === "www.amazon.com" || url.hostname === "www.amazon.co.jp" || url.hostname === "www.amazon.ca" || url.hostname === "www.amazon.com.br" || url.hostname === "www.amazon.com.mx" || url.hostname === "www.amazon.co.uk" || url.hostname === "www.amazon.de" || url.hostname === "www.amazon.fr" || url.hostname === "www.amazon.it" || url.hostname === "www.amazon.es" || url.hostname === "www.amazon.nl" || url.hostname === "www.amazon.cn" || url.hostname === "www.amazon.in" || url.hostname === "www.amazon.au") {
-    return amazon(url, html)
+export default function summary(context: Context) {
+  if (context.url.hostname === "www.amazon.com" || context.url.hostname === "www.amazon.co.jp" || context.url.hostname === "www.amazon.ca" || context.url.hostname === "www.amazon.com.br" || context.url.hostname === "www.amazon.com.mx" || context.url.hostname === "www.amazon.co.uk" || context.url.hostname === "www.amazon.de" || context.url.hostname === "www.amazon.fr" || context.url.hostname === "www.amazon.it" || context.url.hostname === "www.amazon.es" || context.url.hostname === "www.amazon.nl" || context.url.hostname === "www.amazon.cn" || context.url.hostname === "www.amazon.in" || context.url.hostname === "www.amazon.au") {
+    return amazon(context)
   }
-  if (`.${url.hostname}`.endsWith(".wikipedia.org")) {
-    return wikipedia(url, html)
+  if (`.${context.url.hostname}`.endsWith(".wikipedia.org")) {
+    return wikipedia(context)
   }
-  return general(request, url, html)
+  return general(context)
 }

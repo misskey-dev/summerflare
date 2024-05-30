@@ -3,6 +3,7 @@ import getPlayerUrlCommon from "./playerUrlCommon"
 import getPlayerUrlGeneral from "./playerUrlGeneral"
 import getPlayerUrlHeight from "./playerUrlHeight"
 import getPlayerUrlWidth from "./playerUrlWidth"
+import type Context from "../../context"
 
 export interface Player {
   url: string | null
@@ -16,12 +17,12 @@ export interface ParsedPlayer extends Omit<Player, "url"> {
   urlGeneral: string | null
 }
 
-export default function getPlayer(request: Request, url: URL, html: HTMLRewriter): Promise<ParsedPlayer> {
-  const oEmbed = getPlayerOEmbed(request, url, html)
-  const urlGeneral = getPlayerUrlGeneral(url, html)
-  const urlCommon = getPlayerUrlCommon(url, html)
-  const width = getPlayerUrlWidth(url, html)
-  const height = getPlayerUrlHeight(url, html)
+export default function getPlayer(context: Context): Promise<ParsedPlayer> {
+  const oEmbed = getPlayerOEmbed(context)
+  const urlGeneral = getPlayerUrlGeneral(context)
+  const urlCommon = getPlayerUrlCommon(context)
+  const width = getPlayerUrlWidth(context)
+  const height = getPlayerUrlHeight(context)
 
   return Promise.all([oEmbed, urlGeneral, urlCommon, width, height]).then(([oEmbed, urlGeneral, urlCommon, width, height]) => {
     if (oEmbed) {

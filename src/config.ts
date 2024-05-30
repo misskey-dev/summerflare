@@ -1,7 +1,7 @@
 function parseRFC9110ListsLax(value: string | null): string[] {
   return (
     value
-      ?.split(/(?<=^[^"]*|^(?:[^"]*"[^"]*"[^"]*)*),/)
+      ?.split(/(?<=^[^"]*(?:(?:"[^"]*){2})*),/)
       .map((value) => value.trim())
       .filter((value) => value) ?? []
   )
@@ -20,13 +20,13 @@ export function requestInit(request: Request) {
         "200-299": 86400,
         "400-599": 60,
       },
-    } satisfies RequestInitCfProperties,
+    },
     headers: {
       Accept: "text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8",
       "CDN-Loop": cdnLoop.concat(url.hostname).join(", "),
       "User-Agent": "Mozilla/5.0 (compatible; Summerflare; +https://github.com/misskey-dev/summerflare)",
     },
-  }
+  } satisfies RequestInit
 }
 
 if (import.meta.vitest) {

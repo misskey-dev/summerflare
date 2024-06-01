@@ -84,8 +84,12 @@ export default function getPlayerOEmbed(context: Context) {
               decode(allowValue)
                 ?.replace(/^\s*|\s*$/g, "")
                 .split(/\s*;\s*/)
+                .filter((value) => value !== "accelerometer" && value !== "gyroscope")
                 .sort()) ||
             []
+          if (allow.some((value) => value !== "autoplay" && value !== "clipboard-write" && value !== "encrypted-media" && value !== "fullscreen" && value !== "picture-in-picture" && value !== "web-share")) {
+            return
+          }
           const srcValue = element.getAttribute("src")
           const src = srcValue ? decode(srcValue) : null
           switch (data.type) {

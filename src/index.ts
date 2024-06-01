@@ -178,6 +178,27 @@ if (import.meta.vitest) {
           url: "https://open.spotify.com/track/5Odr16TvEN4my22K9nbH7l",
         },
       ],
+      [
+        "spotify.link",
+        "https://spotify.link/aG7rOPfGFDb",
+        "text/html; charset=utf-8",
+        {
+          description: "天空橋朋花 (CV.小岩井ことり) · Song · 2022",
+          icon: "https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico",
+          large: false,
+          player: {
+            allow: ["autoplay", "clipboard-write", "encrypted-media", "fullscreen", "picture-in-picture"],
+            height: 152,
+            url: "https://open.spotify.com/embed/track/5ZBqOdKlSlaYaK0Lyu982P?utm_source=oembed",
+            width: 456,
+          },
+          sensitive: false,
+          sitename: "Spotify",
+          thumbnail: "https://i.scdn.co/image/ab67616d0000b273174510c1fc81e3bcb23c6549",
+          title: "Moonrise Belief",
+          url: "https://open.spotify.com/track/5ZBqOdKlSlaYaK0Lyu982P?si=CMFj2OJfTCKnY8tbECKcpg&utm_source=copy-link&utm_medium=copy-link&nd=1&%24web_only=true",
+        },
+      ],
     ])("should return summary of %s <%s>", async (_, url, contentType, expected) => {
       const request = new Request(`https://fakehost/url?${new URLSearchParams({ url })}`)
       const ctx = createExecutionContext()

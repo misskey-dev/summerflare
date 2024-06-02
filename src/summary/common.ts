@@ -56,21 +56,47 @@ export function cleanupTitle(title: string, siteName: string) {
   return title
 }
 
-const locales = Intl.Segmenter.supportedLocalesOf(["af", "agq", "ak", "am", "ar", "ars", "as", "asa", "ast", "az", "bas", "be", "bem", "bez", "bg", "bgc", "bho", "blo", "bm", "bn", "bo", "br", "brx", "bs", "ca", "ccp", "ce", "ceb", "cgg", "chr", "ckb", "cs", "csw", "cv", "cy", "da", "dav", "de", "dje", "doi", "dsb", "dua", "dyo", "dz", "ebu", "ee", "el", "en", "eo", "es", "et", "eu", "ewo", "fa", "ff", "fi", "fil", "fo", "fr", "fur", "fy", "ga", "gd", "gl", "gsw", "gu", "guz", "gv", "ha", "haw", "he", "hi", "hr", "hsb", "hu", "hy", "ia", "id", "ie", "ig", "ii", "is", "it", "ja", "jgo", "jmc", "jv", "ka", "kab", "kam", "kde", "kea", "kgp", "khq", "ki", "kk", "kkj", "kl", "kln", "km", "kn", "ko", "kok", "ks", "ksb", "ksf", "ksh", "ku", "kw", "kxv", "ky", "lag", "lb", "lg", "lij", "lkt", "lmo", "ln", "lo", "lrc", "lt", "lu", "luo", "luy", "lv", "mai", "mas", "mer", "mfe", "mg", "mgh", "mgo", "mi", "mk", "ml", "mn", "mni", "mr", "ms", "mt", "mua", "my", "mzn", "naq", "nb", "nd", "nds", "ne", "nl", "nmg", "nn", "nnh", "no", "nqo", "nus", "nyn", "oc", "om", "or", "os", "pa", "pcm", "pl", "prg", "ps", "pt", "qu", "raj", "rm", "rn", "ro", "rof", "ru", "rw", "rwk", "sa", "sah", "saq", "sat", "sbp", "sc", "sd", "se", "seh", "ses", "sg", "shi", "si", "sk", "sl", "smn", "sn", "so", "sq", "sr", "su", "sv", "sw", "syr", "szl", "ta", "te", "teo", "tg", "th", "ti", "tk", "to", "tok", "tr", "tt", "twq", "tzm", "ug", "uk", "ur", "uz", "vai", "vec", "vi", "vmw", "vun", "wae", "wo", "xh", "xnr", "xog", "yav", "yi", "yo", "yrl", "yue", "za", "zgh", "zh", "zu"])
-const segmenter = new Intl.Segmenter(locales, { granularity: "word", localeMatcher: "best fit" })
+const grapheme = new Intl.Segmenter()
+const word = new Intl.Segmenter([], { granularity: "word" })
 const ellipsis = "…"
+const ellipsisLength = Array.from(grapheme.segment(ellipsis)).length
 
 export function clip(text: string, length: number) {
-  const segments = segmenter.segment(text)
-  let result = ""
-  for (const segment of segments) {
-    if (result.length + segment.segment.length > length - ellipsis.length) {
-      result += ellipsis
+  const graphemes = Array.from(grapheme.segment(text))
+  if (graphemes.length <= length) {
+    return text
+  }
+  const last = graphemes.at(length - ellipsisLength)!
+  const words = Array.from(word.segment(text))
+  let count = 0
+  for (let i = 0; i < words.length; i++) {
+    if (words[i].index === last.index) {
       break
     }
-    result += segment.segment
+    if (words[i].index > last.index) {
+      count--
+      break
+    }
+    count++
   }
-  return result
+  return (
+    words
+      .slice(0, count)
+      .map((g) => g.segment)
+      .join("") + ellipsis
+  )
+}
+
+if (import.meta.vitest) {
+  const { describe, expect, test } = await import("vitest")
+  describe(clip.name, () => {
+    test("Japanese", () => {
+      expect(clip("吾輩は猫である。名前はまだない。", 1)).toBe("…")
+      expect(clip("吾輩は猫である。名前はまだない。", 2)).toBe("…") // 吾輩 is a single word in Japanese, so it should be clipped entirely.
+      expect(clip("吾輩は猫である。名前はまだない。", 3)).toBe("吾輩…")
+      expect(clip("吾輩は猫である。名前はまだない。", 4)).toBe("吾輩は…")
+    })
+  })
 }
 
 export class BufferedTextHandler {

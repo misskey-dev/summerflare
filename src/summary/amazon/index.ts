@@ -1,4 +1,3 @@
-import cleanupTitle from "summaly/built/utils/cleanup-title"
 import getCard from "../general/card"
 import getDescription from "./description"
 import getFavicon from "../general/favicon"
@@ -11,6 +10,7 @@ import getSiteName from "../general/siteName"
 import getTitle from "./title"
 import getSensitive from "../general/sensitive"
 import type Context from "../../context"
+import type { NullPlayer, ValidPlayer } from "../common"
 
 export default function amazon(context: Context) {
   const card = getCard(context)
@@ -23,13 +23,15 @@ export default function amazon(context: Context) {
         url,
         width,
         height,
-      }
+        allow: [],
+      } satisfies ValidPlayer
     } else {
       return {
         url: null,
         width: null,
         height: null,
-      }
+        allow: [],
+      } satisfies NullPlayer
     }
   })
   const description = getDescription(context)
@@ -38,12 +40,6 @@ export default function amazon(context: Context) {
   const sensitive = getSensitive(context)
 
   return Promise.all([title, thumbnail, player, description, siteName, favicon, sensitive]).then(([title, thumbnail, player, description, siteName, favicon, sensitive]) => {
-    if (title === null) {
-      return null
-    }
-    if (siteName !== null) {
-      title = cleanupTitle(title, siteName)
-    }
     return {
       title,
       thumbnail,
@@ -52,6 +48,7 @@ export default function amazon(context: Context) {
       sitename: siteName,
       icon: favicon,
       sensitive,
+      large: false,
       url: context.url.href,
     }
   })

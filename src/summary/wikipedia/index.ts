@@ -1,6 +1,6 @@
-import clip from "summaly/built/utils/clip"
 import { requestInit } from "../../config"
 import type Context from "../../context"
+import type { NullPlayer } from "../common"
 
 export default async function wikipedia(context: Context) {
   const lang = context.url.hostname.split(".")[0]
@@ -11,15 +11,17 @@ export default async function wikipedia(context: Context) {
   return {
     title: info.title,
     icon: "https://wikipedia.org/static/favicon/wikipedia.ico",
-    description: clip(info.extract, 300),
+    description: info.extract?.trim() || null,
     thumbnail: `https://wikipedia.org/static/images/project-logos/${lang}wiki.png`,
     player: {
       url: null,
       width: null,
       height: null,
       allow: [],
-    },
+    } satisfies NullPlayer,
     sitename: "Wikipedia",
+    sensitive: false,
+    large: false,
     url: context.url.href,
   }
 }

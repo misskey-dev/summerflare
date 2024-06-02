@@ -1,5 +1,4 @@
 import { decode } from "html-entities"
-import clip from "summaly/built/utils/clip"
 import { assign } from "../common"
 import type Context from "../../context"
 import type { PrioritizedReference } from "../common"
@@ -37,7 +36,7 @@ export default function getDescription(context: Context) {
   })
   context.html.onDocument({
     end() {
-      resolve(result.content && clip(result.content, 300))
+      resolve(result.content?.trim() || null)
     },
   })
   return promise

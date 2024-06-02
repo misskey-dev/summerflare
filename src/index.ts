@@ -199,6 +199,27 @@ if (import.meta.vitest) {
           url: "https://open.spotify.com/track/5ZBqOdKlSlaYaK0Lyu982P?si=CMFj2OJfTCKnY8tbECKcpg&utm_source=copy-link&utm_medium=copy-link&nd=1&%24web_only=true",
         },
       ],
+      [
+        "too long texts on Amazon.co.jp",
+        "https://www.amazon.co.jp/dp/4065269210",
+        "text/html;charset=UTF-8",
+        {
+          description: "Amazonで業務用餅, kisui, 六志麻 あさの追放されたチート付与魔術師は気ままなセカンドライフを謳歌する。 ~俺は武器だけじゃなく、あらゆるものに『強化ポイント』を付与できるし、俺の意思でいつでも効果を解除できるけど、残った人たち大丈夫?~(1) (KCデラックス)。アマゾンならポイント還元本が多数。業務用餅, kisui, 六志麻 あさ作品ほか、お急ぎ便対象商品は当日お届けも可能。また追放されたチート付与魔術師は気ままなセカンドライフを謳歌する。 ~俺は武器だけじゃなく、あらゆるものに『強化ポイント』を付与できるし、俺の意思でいつでも効果を解除できるけど、残った人たち大丈夫?~(…",
+          icon: "https://www.amazon.co.jp/favicon.ico",
+          large: false,
+          player: {
+            allow: [],
+            height: null,
+            url: null,
+            width: null,
+          },
+          sensitive: false,
+          sitename: "www.amazon.co.jp",
+          thumbnail: "https://m.media-amazon.com/images/I/51KXmamiQKL._SY445_SX342_.jpg",
+          title: "追放されたチート付与魔術師は気ままなセカンドライフを謳歌する。 ~俺は武器だけじゃなく、あらゆるものに『強化ポイント』を付与できるし、俺の意思でいつでも効果を解除できるけど、残った人たち大丈夫?~(…",
+          url: "https://www.amazon.co.jp/dp/4065269210",
+        },
+      ],
     ])("should return summary of %s <%s>", async (_, url, contentType, expected) => {
       const request = new Request(`https://fakehost/url?${new URLSearchParams({ url })}`)
       const ctx = createExecutionContext()

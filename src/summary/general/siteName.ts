@@ -28,7 +28,7 @@ export default function getSiteName(context: Context) {
   })
   context.html.onDocument({
     end() {
-      resolve(result.content)
+      resolve(result.content?.trim() || null)
     },
   })
   return promise

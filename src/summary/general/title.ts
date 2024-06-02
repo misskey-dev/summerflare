@@ -1,5 +1,4 @@
 import { decode } from "html-entities"
-import clip from "summaly/built/utils/clip"
 import { BufferedTextHandler, assign } from "../common"
 import type Context from "../../context"
 import type { PrioritizedReference } from "../common"
@@ -35,7 +34,7 @@ export default function getTitle(context: Context) {
   )
   context.html.onDocument({
     end() {
-      resolve(result.content && clip(result.content, 100))
+      resolve(result.content?.trim() || null)
     },
   })
   return promise

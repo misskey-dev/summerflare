@@ -28,6 +28,9 @@ function postProcess(summary: Summary | null) {
   }
   if (summary.sitename !== null) {
     summary.title = cleanupTitle(summary.title, summary.sitename)
+    if (!summary.title) {
+      summary.title = summary.sitename
+    }
   }
   summary.title = clip(summary.title, 100)
   summary.description = summary.description && clip(summary.description, 300)

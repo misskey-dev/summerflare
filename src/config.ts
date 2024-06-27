@@ -24,7 +24,7 @@ export function requestInit(request: Request) {
     headers: {
       Accept: "text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8",
       "CDN-Loop": cdnLoop.concat(url.hostname).join(", "),
-      "User-Agent": "Mozilla/5.0 (compatible; Summerflare; +https://github.com/misskey-dev/summerflare)",
+      "User-Agent": "Mozilla/5.0 (compatible; preview) Summerflare/1 (+https://github.com/misskey-dev/summerflare)",
     },
   } satisfies RequestInit
 }
